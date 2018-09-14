@@ -2,45 +2,60 @@ from natsort import natsorted
 import glob
 
 def main():
-    filepath = glob.glob("/Users/asimhirji/Desktop/research/*.txt")
+    #must enter own filepath
+    filepath = glob.glob()
     #sorts files with a natural sort algorithm
     files = natsorted(filepath)
+    write_sim(files)
 
-    
-
-#iterates through all the files and matches files to compare
-def file_iteration(f_list):
-    directory_count = 0
+def write_sim(files):
     count = 0
-    for i in range(len(f_list)):
-        #skips every fourth file pair due to docgroup changes
+    g_count = 0
+    for i in range(len(files) - 1):
+        
         if (count == 3):
             count = 0
             continue
-        
-        prog_control(file_list[i],file_list[i+1])
-        str1 = file_list[i]
-        str2 = file_list[i+1]
-        
-        count += 1
-        directory_count += 1
-
-        #kills program when last file is reached
-        if (directory_count = len(file_list) - 1):
-            break
-
-
-        
-#needs to write out a new text file still
-       
-def prog_control(file1, file2):
-    #reads both files and puts each sentence in a list
-    file1 = open(file1, "r") 
-    arr1 = file1.readlines()[3:]
     
-    file2 = open(file2, "r")
-    arr2 = file2.readlines()[3:]
-  
+        str1 = files[i]
+        str2 = files[i+1]
+        
+        #gets document id number
+        #need to change numbers in group_id1 and id1 depending on directory length
+        group_id1 = str1[47:]
+        id_count = 0
+        for char in group_id1:
+            if (char.isdigit()):
+                id_count += 1
+        id1 = str1[47: 46 + id_count]
+
+        g_count = group_type(g_count,id1)
+        control(str1,str2)
+        count += 1
+        
+#prints group id for the document
+def group_type(id_count, id_num):
+    if (id_count == 0):
+            print("docgroup" + id_num + "_G4vsG6: ", end = '')
+            id_count += 1
+    elif (id_count == 1):
+            print("docgroup" + id_num + "_G6vsG8: ", end = '')
+            id_count += 1
+    elif (id_count == 2):
+            print("docgroup" + id_num + "_G8vsG12: ", end = '')
+            id_count = 0
+    return id_count
+        
+
+def control(file1,file2):
+    #reads both files and puts each sentence in a list
+    f1 = open(file1, "r")
+    f2 = open(file2, "r")
+
+    #skips first 3 lines in each article.
+    arr1 = f1.readlines()[3:]
+    arr2 = f2.readlines()[3:]
+
     #filters sentences
     art1 = filter_list(arr1)
     art2 = filter_list(arr2)
@@ -49,16 +64,16 @@ def prog_control(file1, file2):
 
     #find jaccard similarity between article
     value = jacc_compare(art1,art2)
-        
+    print(value)
+
 #takes original sentence and filters anything not letter,space, or '     
 def filter_list(f_list):
-    for i in range(len(f_list))
+    for i in range(len(f_list)):
         sentence = f_list[i]
         new_line = filter_str(sentence)
         f_list[i] = new_line
     return f_list
 
-#works
 #filters string to read only words
 def filter_str(st):
     chars = st.split()
@@ -69,7 +84,7 @@ def filter_str(st):
     case_str = new_str.lower()
     return case_str
 
-#compares sentences in different articles
+#compares sentences in dif ferent articles
 def jacc_compare(list1,list2):
     nums_array = []
     for elem in list1:
@@ -88,7 +103,6 @@ def jacc_compare(list1,list2):
     art_coeff = art_jacc(nums_array)
     return art_coeff
 
-#works
 #calculates jaccard similarity
 def jacc_calc(str1,str2):
     a = set(str1.split())
@@ -97,7 +111,6 @@ def jacc_calc(str1,str2):
 
     return float(len(c)/(len(a) + len(b) - len(c)))
 
-#works
 #find average jaccard coeff for entire article
 def art_jacc(arr):
     sum1 = 0.0
